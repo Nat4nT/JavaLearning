@@ -1,7 +1,6 @@
 // package AtividadeFinal;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.text.DecimalFormat;
@@ -11,12 +10,20 @@ public class Transportadora implements ImportArquivos{
     float valorExpresso;
     float valorNormal;
     BufferedReader reader;
+    int qtdAlert;
+
+    int[] nroAlert = new int[1000];
+    float[] pesoAlert = new float[1000];
+    float[] freteAlert = new float[1000];
+
 
    private Encomenda[] vetEncomendas;
    private EncomendaExpressa[] vetEncomendasExpressas;
    private int qtdEncomenda = 0;
    private int qtdEncomendaExpressa = 0;
 
+
+ 
    public Transportadora(){
         this.vetEncomendas =  new Encomenda[1000];
         this.vetEncomendasExpressas = new EncomendaExpressa[1000];
@@ -190,16 +197,40 @@ public class Transportadora implements ImportArquivos{
         DecimalFormat df = new DecimalFormat("0.00");
         int nroPedido;
         float peso;
-        float frete;
+        //float frete;
+
         System.out.println("Numero Pedido  "+"  Peso   " + "   Valor Frete   ");
         for (int i = 0; i < qtdEncomendaExpressa; i++) {
             EncomendaExpressa ee = this.vetEncomendasExpressas[i];
-            frete = ee.getValorfrete();
+            if (ee.getPrazoEntrega() == 1 ) {
+                emergencia(ee.getNroPedido(), ee.getPeso(), ee.getValorfrete(),ee.getPrazoEntrega(), qtdAlert);
+                this.qtdAlert++;
+            }else
+            //frete = ee.getValorfrete();
             peso = ee.getPeso();
             nroPedido = ee.getNroPedido();
-            System.out.println(nroPedido + "             " +peso+"        R$ "+df.format(frete));    
+            System.out.println(nroPedido + "             " + ee.getPeso()+"        R$ "+df.format(ee.getValorfrete()));    
+        }
+        System.out.println(" ");
+        System.out.println("--- ENCOMENDAS COM O PRAZO DE 1 DIA ---");
+        System.out.println("Numero Pedido  "+"  Peso   " + "   Valor Frete   ");
+
+        listarAlerts();
+        this.qtdAlert = 0;
+    }
+    public void emergencia(int nroPedido,float peso, float frete,int prazo, int qtdAlert){
+        this.nroAlert[qtdAlert] = nroPedido;
+        this.pesoAlert[qtdAlert] = peso;
+        this.freteAlert[qtdAlert] = freteExpresso(peso, prazo); 
+    }
+
+    public void  listarAlerts(){
+        DecimalFormat df = new DecimalFormat("0.00");
+        for (int i = 0; i < qtdAlert; i++) {
+            System.out.println(this.nroAlert[i] +"             "+  this.pesoAlert[i]+"         R$ "+ df.format(this.freteAlert[i]));
         }
     }
+    
 
     public void listarNormal(){
         DecimalFormat df = new DecimalFormat("0.00");
